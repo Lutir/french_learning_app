@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
 import { COLORS, TYPOGRAPHY, SPACING } from '../../constants';
 
 /**
@@ -19,6 +19,8 @@ interface ButtonProps {
   textStyle?: TextStyle;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({ 
@@ -27,12 +29,15 @@ const Button: React.FC<ButtonProps> = ({
   style, 
   textStyle, 
   variant = 'primary',
-  size = 'md'
+  size = 'md',
+  loading = false,
+  disabled = false
 }) => {
   const buttonStyle = [
     styles.button,
     styles[variant],
     styles[size],
+    (loading || disabled) && styles.disabled,
     style
   ];
 
@@ -40,6 +45,7 @@ const Button: React.FC<ButtonProps> = ({
     styles.text,
     styles[`${variant}Text`],
     styles[`${size}Text`],
+    (loading || disabled) && styles.disabledText,
     textStyle
   ];
 
@@ -48,8 +54,16 @@ const Button: React.FC<ButtonProps> = ({
       style={buttonStyle} 
       onPress={onPress} 
       activeOpacity={0.8}
+      disabled={loading || disabled}
     >
-      <Text style={textStyleCombo}>{title}</Text>
+      {loading ? (
+        <ActivityIndicator 
+          size="small" 
+          color={variant === 'primary' ? COLORS.textInverse : COLORS.primary} 
+        />
+      ) : (
+        <Text style={textStyleCombo}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -131,6 +145,14 @@ const styles = StyleSheet.create({
   },
   lgText: {
     fontSize: TYPOGRAPHY.fontSize.lg,
+  },
+  
+  // Disabled state
+  disabled: {
+    opacity: 0.6,
+  },
+  disabledText: {
+    opacity: 0.6,
   },
 });
 

@@ -15,18 +15,20 @@ type RootStackParamList = {
   Home: undefined;
 };
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 interface Props {
-  navigation: LoginScreenNavigationProp;
+  navigation: RegisterScreenNavigationProp;
 }
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const { login, isLoading, error, clearError } = useAuthStore();
+const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+  const { register, isLoading, error, clearError } = useAuthStore();
   
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -47,8 +49,18 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   const validateFormData = () => {
     const validationRules = {
+      name: VALIDATION_RULES.name,
       email: VALIDATION_RULES.email,
       password: VALIDATION_RULES.password,
+      confirmPassword: {
+        ...VALIDATION_RULES.confirmPassword,
+        custom: (value: string) => {
+          if (value !== formData.password) {
+            return 'Passwords do not match';
+          }
+          return null;
+        },
+      },
     };
 
     const result = validateForm(formData, validationRules);
@@ -56,44 +68,51 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     return result.isValid;
   };
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (!validateFormData()) {
       return;
     }
 
     try {
-      await login({
+      await register({
+        name: formData.name,
         email: formData.email,
         password: formData.password,
       });
       
       // Navigation will be handled by the auth state change
     } catch (error) {
-      Alert.alert('Login Failed', 'Please check your credentials and try again.');
+      Alert.alert('Registration Failed', 'Please try again.');
     }
   };
 
-  const handleRegisterPress = () => {
-    navigation.navigate('Register');
-  };
-
-  const handleForgotPassword = () => {
-    // TODO: Implement forgot password functionality
-    Alert.alert('Forgot Password', 'This feature will be implemented soon.');
+  const handleLoginPress = () => {
+    navigation.navigate('Login');
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Heading variant="3xl" align="center" style={styles.title}>
-          Welcome Back
+          Create Account
         </Heading>
         <Body align="center" color={COLORS.textSecondary} style={styles.subtitle}>
-          Sign in to continue your French learning journey
+          Join thousands of learners mastering French
         </Body>
       </View>
 
       <View style={styles.form}>
+        <Input
+          label="Full Name"
+          placeholder="Enter your full name"
+          value={formData.name}
+          onChangeText={(value) => handleInputChange('name', value)}
+          error={errors.name}
+          autoCapitalize="words"
+          autoCorrect={false}
+          size="lg"
+        />
+
         <Input
           label="Email"
           placeholder="Enter your email"
@@ -108,7 +127,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
         <Input
           label="Password"
-          placeholder="Enter your password"
+          placeholder="Create a password"
           value={formData.password}
           onChangeText={(value) => handleInputChange('password', value)}
           error={errors.password}
@@ -116,12 +135,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           size="lg"
         />
 
-        <Button
-          title="Forgot Password?"
-          onPress={handleForgotPassword}
-          variant="ghost"
-          size="sm"
-          style={styles.forgotPasswordButton}
+        <Input
+          label="Confirm Password"
+          placeholder="Confirm your password"
+          value={formData.confirmPassword}
+          onChangeText={(value) => handleInputChange('confirmPassword', value)}
+          error={errors.confirmPassword}
+          secureTextEntry
+          size="lg"
         />
 
         {error && (
@@ -133,12 +154,12 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         )}
 
         <Button
-          title="Sign In"
-          onPress={handleLogin}
+          title="Create Account"
+          onPress={handleRegister}
           variant="primary"
           size="lg"
           loading={isLoading}
-          style={styles.loginButton}
+          style={styles.registerButton}
         />
 
         <View style={styles.divider}>
@@ -150,8 +171,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </View>
 
         <Button
-          title="Don't have an account? Sign Up"
-          onPress={handleRegisterPress}
+          title="Already have an account? Sign In"
+          onPress={handleLoginPress}
           variant="outline"
           size="md"
         />
@@ -182,11 +203,8 @@ const styles = StyleSheet.create({
   form: {
     marginBottom: SPACING[6],
   },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginBottom: SPACING[4],
-  },
-  loginButton: {
+  registerButton: {
+    marginTop: SPACING[4],
     marginBottom: SPACING[6],
   },
   errorContainer: {
@@ -210,4 +228,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen; 
+export default RegisterScreen; 

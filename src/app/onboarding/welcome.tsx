@@ -8,6 +8,7 @@ import { COLORS, SPACING } from '../../constants';
 type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
+  Register: undefined;
   Home: undefined;
   Lessons: undefined;
   Games: undefined;
@@ -28,6 +29,10 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleLogin = () => {
     navigation.navigate('Login');
+  };
+
+  const handleRegister = () => {
+    navigation.navigate('Register');
   };
 
   return (
@@ -54,6 +59,13 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
           title="Login" 
           onPress={handleLogin}
           variant="outline"
+          size="md"
+          style={styles.secondaryButton}
+        />
+        <Button 
+          title="Create Account" 
+          onPress={handleRegister}
+          variant="secondary"
           size="md"
           style={styles.secondaryButton}
         />
