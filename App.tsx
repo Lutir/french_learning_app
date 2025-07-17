@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { COLORS, TYPOGRAPHY } from './src/constants';
 import { useAuthStore } from './src/stores';
+import { ErrorBoundary } from './src/components/ui/ErrorBoundary';
 
 // Import our screens
 import WelcomeScreen from './src/app/onboarding/welcome';
@@ -21,8 +22,9 @@ export default function App() {
   const { isAuthenticated } = useAuthStore();
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <NavigationContainer>
         <StatusBar style="auto" />
       <Stack.Navigator 
         initialRouteName={isAuthenticated ? "MainApp" : "Welcome"}
@@ -80,7 +82,8 @@ export default function App() {
           />
         )}
       </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

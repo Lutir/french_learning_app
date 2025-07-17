@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import Card from '../../../components/ui/Card';
 import ProgressBar from '../../../components/ui/ProgressBar';
 import { COLORS, TYPOGRAPHY, SPACING } from '../../../constants';
 
 const LessonsScreen: React.FC = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  
   const lessons = [
     { id: 1, title: 'Greetings', progress: 1.0, completed: true },
     { id: 2, title: 'Numbers 1-10', progress: 0.7, completed: false },
@@ -16,8 +18,27 @@ const LessonsScreen: React.FC = () => {
     console.log(`Navigate to lesson ${lessonId}`);
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
+        />
+      }
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Lessons</Text>
         <Text style={styles.subtitle}>Master French step by step</Text>

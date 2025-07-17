@@ -4,6 +4,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuthStore } from '../../stores';
 import { Input } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import { PasswordStrengthIndicator } from '../../components/ui/PasswordStrengthIndicator';
+import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { Text, Heading, Body, Caption } from '../../components/ui/Text';
 import { COLORS, SPACING } from '../../constants';
 import { validateForm, VALIDATION_RULES } from '../../utils/validation';
@@ -95,7 +97,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Heading variant="3xl" align="center" style={styles.title}>
           Create Account
@@ -138,6 +141,10 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           secureTextEntry
           size="lg"
         />
+        
+        {formData.password && (
+          <PasswordStrengthIndicator password={formData.password} />
+        )}
 
         <Input
           label="Confirm Password"
@@ -181,7 +188,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           size="md"
         />
       </View>
-    </ScrollView>
+      </ScrollView>
+      
+      <LoadingOverlay 
+        visible={isLoading} 
+        message="Creating your account..." 
+      />
+    </>
   );
 };
 

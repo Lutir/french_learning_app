@@ -1,18 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { COLORS, TYPOGRAPHY, SPACING } from '../../constants';
 
 const HomeScreen: React.FC = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  
   const currentLevel = 1;
   const currentXP = 150;
   const xpToNextLevel = 500;
   const progress = currentXP / xpToNextLevel;
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
+        />
+      }
+    >
       <View style={styles.header}>
         <Text style={styles.greeting}>Bonjour! 👋</Text>
         <Text style={styles.subtitle}>Continue your French journey</Text>

@@ -158,6 +158,40 @@ export const VALIDATION_RULES = {
       return null;
     },
   },
+  
+  username: {
+    required: true,
+    minLength: 3,
+    maxLength: 20,
+    pattern: /^[a-zA-Z0-9_]+$/,
+    custom: (value: string) => {
+      if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+        return 'Username can only contain letters, numbers, and underscores';
+      }
+      return null;
+    },
+  },
+  
+  phone: {
+    required: false,
+    pattern: /^[\+]?[1-9][\d]{0,15}$/,
+    custom: (value: string) => {
+      if (value && !/^[\+]?[1-9][\d]{0,15}$/.test(value)) {
+        return 'Please enter a valid phone number';
+      }
+      return null;
+    },
+  },
+  
+  age: {
+    required: false,
+    custom: (value: number) => {
+      if (value && (value < 13 || value > 100)) {
+        return 'Age must be between 13 and 100';
+      }
+      return null;
+    },
+  },
 };
 
 // Helper function to validate specific fields
