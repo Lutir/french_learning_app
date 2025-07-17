@@ -1,9 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal } from 'react-native';
 import Card from '../../../components/ui/Card';
+import { WordMatchingGame } from '../../../components/games/WordMatchingGame';
+import { getWordsByCategory } from '../../../data/lessons';
 import { COLORS, TYPOGRAPHY, SPACING } from '../../../constants';
 
 const GamesScreen: React.FC = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [showWordMatching, setShowWordMatching] = useState(false);
+  
   const games = [
     {
       id: 1,
@@ -29,11 +35,45 @@ const GamesScreen: React.FC = () => {
   ];
 
   const handleGamePress = (gameId: number) => {
-    console.log(`Start game ${gameId}`);
+    if (gameId === 1) {
+      setShowWordMatching(true);
+    } else {
+      console.log(`Start game ${gameId}`);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const handleWordMatchingComplete = (score: number, timeSpent: number, mistakes: number) => {
+    console.log(`Word Matching completed! Score: ${score}, Time: ${timeSpent}s, Mistakes: ${mistakes}`);
+    setShowWordMatching(false);
+    // TODO: Save game results to user progress
+  };
+
+  const handleWordMatchingExit = () => {
+    setShowWordMatching(false);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <>
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
+          />
+        }
+      >
       <View style={styles.header}>
         <Text style={styles.title}>Games</Text>
         <Text style={styles.subtitle}>Learn French through fun games</Text>
@@ -58,8 +98,22 @@ const GamesScreen: React.FC = () => {
             </View>
           </Card>
         </TouchableOpacity>
-      ))}
-    </ScrollView>
+              ))}
+      </ScrollView>
+
+      {/* Word Matching Game Modal */}
+      <Modal
+        visible={showWordMatching}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <WordMatchingGame
+          words={getWordsByCategory('greetings')}
+          onComplete={handleWordMatchingComplete}
+          onExit={handleWordMatchingExit}
+        />
+      </Modal>
+    </>
   );
 };
 
