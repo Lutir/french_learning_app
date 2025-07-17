@@ -17,7 +17,7 @@ const LessonsScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.title}>Lessons</Text>
         <Text style={styles.subtitle}>Master French step by step</Text>
@@ -52,9 +52,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  scrollContent: {
+    paddingBottom: 20, // Small padding for content spacing
+  },
   header: {
     padding: SPACING.lg,
-    paddingTop: SPACING.xl,
+    paddingTop: SPACING.md,
   },
   title: {
     fontSize: TYPOGRAPHY.fontSize['2xl'],

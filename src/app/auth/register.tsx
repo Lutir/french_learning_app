@@ -12,6 +12,9 @@ type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  LanguageSelection: undefined;
+  LearningGoals: undefined;
+  AvatarCreation: undefined;
   Home: undefined;
 };
 
@@ -80,7 +83,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         password: formData.password,
       });
       
-      // Navigation will be handled by the auth state change
+      // After registration, start onboarding
+      navigation.navigate('LanguageSelection');
     } catch (error) {
       Alert.alert('Registration Failed', 'Please try again.');
     }

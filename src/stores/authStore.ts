@@ -166,6 +166,17 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Convert string dates back to Date objects after rehydration
+        if (state?.user) {
+          if (typeof state.user.createdAt === 'string') {
+            state.user.createdAt = new Date(state.user.createdAt);
+          }
+          if (typeof state.user.lastActive === 'string') {
+            state.user.lastActive = new Date(state.user.lastActive);
+          }
+        }
+      },
     }
   )
 ); 

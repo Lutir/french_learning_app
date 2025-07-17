@@ -12,7 +12,7 @@ const HomeScreen: React.FC = () => {
   const progress = currentXP / xpToNextLevel;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Bonjour! 👋</Text>
         <Text style={styles.subtitle}>Continue your French journey</Text>
@@ -56,9 +56,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  scrollContent: {
+    paddingBottom: 20, // Small padding for content spacing
+  },
   header: {
     padding: SPACING[6],
-    paddingTop: SPACING[8],
+    paddingTop: SPACING[4],
   },
   greeting: {
     fontSize: TYPOGRAPHY.fontSize['2xl'],

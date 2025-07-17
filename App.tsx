@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { COLORS, TYPOGRAPHY } from './src/constants';
 import { useAuthStore } from './src/stores';
 
@@ -9,11 +10,10 @@ import { useAuthStore } from './src/stores';
 import WelcomeScreen from './src/app/onboarding/welcome';
 import LoginScreen from './src/app/auth/login';
 import RegisterScreen from './src/app/auth/register';
-import HomeScreen from './src/app/main/home';
-import LessonsScreen from './src/app/main/lessons';
-import GamesScreen from './src/app/main/games';
-import ProgressScreen from './src/app/main/progress';
-import ProfileScreen from './src/app/main/profile';
+import LanguageSelectionScreen from './src/app/onboarding/language-selection';
+import LearningGoalsScreen from './src/app/onboarding/learning-goals';
+import AvatarCreationScreen from './src/app/onboarding/avatar-creation';
+import MainTabs from './src/navigation/MainTabs';
 
 const Stack = createStackNavigator();
 
@@ -21,10 +21,11 @@ export default function App() {
   const { isAuthenticated } = useAuthStore();
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
       <Stack.Navigator 
-        initialRouteName={isAuthenticated ? "Home" : "Welcome"}
+        initialRouteName={isAuthenticated ? "MainApp" : "Welcome"}
         screenOptions={{
           headerStyle: {
             backgroundColor: COLORS.primary,
@@ -37,7 +38,7 @@ export default function App() {
         }}
       >
         {!isAuthenticated ? (
-          // Auth screens
+          // Auth and onboarding screens
           <>
             <Stack.Screen 
               name="Welcome" 
@@ -54,38 +55,32 @@ export default function App() {
               component={RegisterScreen} 
               options={{ title: 'Create Account' }}
             />
+            <Stack.Screen 
+              name="LanguageSelection" 
+              component={LanguageSelectionScreen} 
+              options={{ title: 'Your Level', headerShown: false }}
+            />
+            <Stack.Screen 
+              name="LearningGoals" 
+              component={LearningGoalsScreen} 
+              options={{ title: 'Learning Goals', headerShown: false }}
+            />
+            <Stack.Screen 
+              name="AvatarCreation" 
+              component={AvatarCreationScreen} 
+              options={{ title: 'Choose Avatar', headerShown: false }}
+            />
           </>
         ) : (
-          // Main app screens
-          <>
-            <Stack.Screen 
-              name="Home" 
-              component={HomeScreen} 
-              options={{ title: 'French Learning' }}
-            />
-            <Stack.Screen 
-              name="Lessons" 
-              component={LessonsScreen} 
-              options={{ title: 'Lessons' }}
-            />
-            <Stack.Screen 
-              name="Games" 
-              component={GamesScreen} 
-              options={{ title: 'Games' }}
-            />
-            <Stack.Screen 
-              name="Progress" 
-              component={ProgressScreen} 
-              options={{ title: 'Progress' }}
-            />
-            <Stack.Screen 
-              name="Profile" 
-              component={ProfileScreen} 
-              options={{ title: 'Profile' }}
-            />
-          </>
+          // Main app with tab navigation
+          <Stack.Screen 
+            name="MainApp" 
+            component={MainTabs} 
+            options={{ headerShown: false }}
+          />
         )}
       </Stack.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

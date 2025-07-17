@@ -1,52 +1,139 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useAuthStore, useUserStore } from '../../../stores';
 import Card from '../../../components/ui/Card';
-import { COLORS, TYPOGRAPHY, SPACING } from '../../../constants';
+import { Text, Heading, Body, Caption } from '../../../components/ui/Text';
+import { COLORS, SPACING } from '../../../constants';
 
 const ProfileScreen: React.FC = () => {
-  const user = {
-    name: 'French Learner',
-    email: 'learner@example.com',
-    level: 1,
-    joinDate: 'January 2024',
+  const { user, logout } = useAuthStore();
+  const { progress, preferences } = useUserStore();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            logout();
+          },
+        },
+      ]
+    );
   };
 
   const menuItems = [
-    { id: 1, title: 'Settings', icon: '⚙️', onPress: () => console.log('Settings') },
-    { id: 2, title: 'Help & Support', icon: '❓', onPress: () => console.log('Help') },
-    { id: 3, title: 'About', icon: 'ℹ️', onPress: () => console.log('About') },
-    { id: 4, title: 'Logout', icon: '🚪', onPress: () => console.log('Logout') },
+    { 
+      id: 1, 
+      title: 'Settings', 
+      icon: '⚙️', 
+      onPress: () => Alert.alert('Settings', 'Settings screen coming soon!') 
+    },
+    { 
+      id: 2, 
+      title: 'Help & Support', 
+      icon: '❓', 
+      onPress: () => Alert.alert('Help', 'Help & Support coming soon!') 
+    },
+    { 
+      id: 3, 
+      title: 'About', 
+      icon: 'ℹ️', 
+      onPress: () => Alert.alert('About', 'French Learning App v1.0.0') 
+    },
+    { 
+      id: 4, 
+      title: 'Logout', 
+      icon: '🚪', 
+      onPress: handleLogout,
+      destructive: true 
+    },
   ];
 
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long' 
+    });
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
+        <Heading variant="2xl">Profile</Heading>
       </View>
 
       <Card style={styles.profileCard}>
         <View style={styles.profileHeader}>
-          <Text style={styles.profileEmoji}>👤</Text>
+          <Text style={styles.profileEmoji}>
+            {user?.avatar ? '👤' : '👤'}
+          </Text>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user.name}</Text>
-            <Text style={styles.profileEmail}>{user.email}</Text>
-            <Text style={styles.profileLevel}>Level {user.level}</Text>
+            <Heading variant="xl" style={styles.profileName}>
+              {user?.name || 'French Learner'}
+            </Heading>
+            <Body color={COLORS.textSecondary} style={styles.profileEmail}>
+              {user?.email || 'learner@example.com'}
+            </Body>
+            <Caption color={COLORS.primary} weight="medium" style={styles.profileLevel}>
+              Level {progress.level} • {user?.proficiencyLevel || 'beginner'}
+            </Caption>
           </View>
         </View>
-        <Text style={styles.joinDate}>Member since {user.joinDate}</Text>
+        <Caption color={COLORS.textSecondary} style={styles.joinDate}>
+          Member since {user?.createdAt ? formatDate(user.createdAt) : 'January 2024'}
+        </Caption>
+      </Card>
+
+      <Card style={styles.statsCard}>
+        <Heading variant="lg" style={styles.statsTitle}>Your Progress</Heading>
+        <View style={styles.statsGrid}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{progress.totalXP}</Text>
+            <Caption>Total XP</Caption>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{progress.streak}</Text>
+            <Caption>Day Streak</Caption>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{progress.lessonsCompleted}</Text>
+            <Caption>Lessons</Caption>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{progress.totalStudyTime}</Text>
+            <Caption>Minutes</Caption>
+          </View>
+        </View>
       </Card>
 
       <Card style={styles.menuCard}>
         {menuItems.map((item) => (
           <TouchableOpacity
             key={item.id}
-            style={styles.menuItem}
+            style={[
+              styles.menuItem,
+              item.destructive && styles.menuItemDestructive
+            ]}
             onPress={item.onPress}
             activeOpacity={0.7}
           >
             <View style={styles.menuItemContent}>
               <Text style={styles.menuIcon}>{item.icon}</Text>
-              <Text style={styles.menuTitle}>{item.title}</Text>
+              <Body style={[
+                styles.menuTitle,
+                item.destructive && styles.menuTitleDestructive
+              ]}>
+                {item.title}
+              </Body>
             </View>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
@@ -54,7 +141,7 @@ const ProfileScreen: React.FC = () => {
       </Card>
 
       <View style={styles.footer}>
-        <Text style={styles.version}>Version 1.0.0</Text>
+        <Caption color={COLORS.textSecondary}>Version 1.0.0</Caption>
       </View>
     </ScrollView>
   );
@@ -65,60 +152,73 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    padding: SPACING.lg,
-    paddingTop: SPACING.xl,
+  scrollContent: {
+    paddingBottom: 20, // Small padding for content spacing
   },
-  title: {
-    fontSize: TYPOGRAPHY.fontSize['2xl'],
-    fontFamily: TYPOGRAPHY.fontFamily.bold,
-    color: COLORS.textPrimary,
+  header: {
+    padding: SPACING[6],
+    paddingTop: SPACING[4],
   },
   profileCard: {
-    margin: SPACING.lg,
+    margin: SPACING[6],
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: SPACING[4],
   },
   profileEmoji: {
     fontSize: 50,
-    marginRight: SPACING.md,
+    marginRight: SPACING[4],
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
-    fontSize: TYPOGRAPHY.fontSize.xl,
-    fontFamily: TYPOGRAPHY.fontFamily.semibold,
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING[1],
   },
   profileEmail: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING[1],
   },
   profileLevel: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: COLORS.primary,
-    fontFamily: TYPOGRAPHY.fontFamily.medium,
+    marginBottom: SPACING[2],
   },
   joinDate: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textSecondary,
+    marginTop: SPACING[2],
+  },
+  statsCard: {
+    margin: SPACING[6],
+  },
+  statsTitle: {
+    marginBottom: SPACING[4],
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: SPACING[1],
   },
   menuCard: {
-    margin: SPACING.lg,
+    margin: SPACING[6],
   },
   menuItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING[4],
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.textMuted,
+    borderBottomColor: COLORS.border,
+  },
+  menuItemDestructive: {
+    borderBottomColor: COLORS.error + '20',
   },
   menuItemContent: {
     flexDirection: 'row',
@@ -126,23 +226,21 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     fontSize: 24,
-    marginRight: SPACING.md,
+    marginRight: SPACING[4],
   },
   menuTitle: {
-    fontSize: TYPOGRAPHY.fontSize.base,
     color: COLORS.textPrimary,
   },
+  menuTitleDestructive: {
+    color: COLORS.error,
+  },
   menuArrow: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontSize: 18,
     color: COLORS.textSecondary,
   },
   footer: {
-    padding: SPACING.lg,
+    padding: SPACING[6],
     alignItems: 'center',
-  },
-  version: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.textSecondary,
   },
 });
 

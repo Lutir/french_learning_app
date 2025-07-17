@@ -33,7 +33,7 @@ const GamesScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.title}>Games</Text>
         <Text style={styles.subtitle}>Learn French through fun games</Text>
@@ -81,9 +81,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  scrollContent: {
+    paddingBottom: 20, // Small padding for content spacing
+  },
   header: {
     padding: SPACING.lg,
-    paddingTop: SPACING.xl,
+    paddingTop: SPACING.md,
   },
   title: {
     fontSize: TYPOGRAPHY.fontSize['2xl'],
