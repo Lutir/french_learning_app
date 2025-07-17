@@ -10,7 +10,12 @@ export interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  custom?: (value: any) => string | null;
+  /**
+   * Optional custom validation function. When used with `validateForm` the
+   * complete form data object will be passed as the second argument so rules
+   * can validate against other fields.
+   */
+  custom?: (value: any, formData?: Record<string, any>) => string | null;
 }
 
 export interface ValidationRules {
@@ -90,7 +95,7 @@ export const validateForm = (data: Record<string, any>, rules: ValidationRules):
     
     // Custom validation
     if (rule.custom) {
-      const customError = rule.custom(value);
+      const customError = rule.custom(value, data);
       if (customError) {
         errors[field] = customError;
       }
